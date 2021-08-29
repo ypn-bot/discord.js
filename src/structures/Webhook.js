@@ -19,6 +19,8 @@ class Webhook {
      */
     Object.defineProperty(this, 'client', { value: client });
     if (data) this._patch(data);
+
+    this.user = null;
   }
 
   _patch(data) {
@@ -106,6 +108,94 @@ class Webhook {
    * @property {MessageActionRow[]|MessageActionRowOptions[]} [components]
    * Action rows containing interactive components for the message (buttons, select menus)
    */
+
+  /**
+   * Send a message to the specified channel using a random webhook
+   * @param {WebhookMessageOptions} options The default options that will be passed to the webhook.
+   * @param {User} user The user that will be user as the webhook name. (Optional)
+   * @returns {Promise<boolean>}
+   */
+  async execute(options, user) {
+    if (user) {
+      options = {
+        ...options,
+        username: user.username,
+        avatarURL: user.displayAvatarURL({ format: 'png', size: 1024 }),
+      };
+    }
+    try {
+      await this.send(options);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  }
+
+  _sendAs(content, user) {
+    content = {
+      ...content,
+      username: user.username,
+      avatarURL: user.displayAvatarURL({ format: 'png', size: 1024 }),
+    };
+    return this.send(content);
+  }
+  /**
+   * Get text format used YPN replies
+   * @param {Message} message represent discord message
+   * @param {string} content content from message
+   * @returns {Promise<Object>}
+   */
+  async getReply(message, content) {
+    let allowedMentions = { parse: [], repliedUser: false };
+    if (!message.reference) return { text: content, allowedMentions: { parse: ['users', 'roles'] } };
+    if (!message.reference.messageId) return { text: `┌ Couldn't load message\n${content}` };
+
+    let reference = await message.channel.messages.fetch(message.reference.messageId);
+    let msg = reference.content?.replace(/^┌.*\n/i, '') || 'Click to see message';
+
+    if (msg.length > 50) {
+      msg = `${msg.split(0, 50)} ...`;
+    }
+
+    if ([...msg.matchAll(/\|\|/g)].length % 2 !== 0) {
+      msg = msg.replace('...', '||...');
+    }
+
+    if (reference.stickers.size > 0) {
+      msg = 'Click to see sticker';
+    }
+
+    // eslint-disable-next-line
+    if (reference.attachments.size > 0 || reference.embeds.length > 0 || !!msg.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)$/)) {
+      msg = 'Click to see attachment';
+    }
+
+    let mentions = {
+      users: [...message.mentions.users.map(m => m.id)],
+      roles: [...message.mentions.roles.map(r => r.id)],
+    };
+
+    if (message.mentions.users.size > [...message.content.matchAll(/<@!?d+>/gm)].length) {
+      if (reference.author) {
+        allowedMentions.repliedUser = true;
+      }
+    }
+
+    if (mentions.users.length > 0) {
+      allowedMentions.users = mentions.users;
+    }
+
+    if (mentions.roles.length > 0) {
+      allowedMentions.roles = mentions.roles;
+    }
+
+    return {
+      // eslint-disable-next-line
+      text: '┌ ' + (reference.author ? '<@!' + reference.author.id + '>' : '@unknown') + ': [' + msg + '](<https://discord.com/channels/' + message.guildId + '/' + message.channelId + '/' + message.reference.messageId + '>)\n' + content,
+      allowedMentions,
+    };
+  }
 
   /**
    * Sends a message with this webhook.

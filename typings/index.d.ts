@@ -308,6 +308,7 @@ export class BaseGuildTextChannel extends TextBasedChannel(GuildChannel) {
   public nsfw: boolean;
   public threads: ThreadManager<AllowedThreadTypeForTextChannel | AllowedThreadTypeForNewsChannel>;
   public topic: string | null;
+  public lastWebhook: null | Webhook;
   public createInvite(options?: CreateInviteOptions): Promise<Invite>;
   public createWebhook(name: string, options?: ChannelWebhookCreateOptions): Promise<Webhook>;
   public fetchInvites(cache?: boolean): Promise<Collection<string, Invite>>;
@@ -320,6 +321,8 @@ export class BaseGuildTextChannel extends TextBasedChannel(GuildChannel) {
   public setType(type: Pick<typeof ChannelTypes, 'GUILD_TEXT'>, reason?: string): Promise<TextChannel>;
   public setType(type: Pick<typeof ChannelTypes, 'GUILD_NEWS'>, reason?: string): Promise<NewsChannel>;
   public fetchWebhooks(): Promise<Collection<Snowflake, Webhook>>;
+  public createWebhooks(): Promise<Collection<Snowflake, Webhook>>;
+  public getWebhook(): Promise<Webhook>;
 }
 
 export class BaseGuildVoiceChannel extends GuildChannel {
@@ -2057,13 +2060,16 @@ export class Webhook extends WebhookMixin() {
   public avatarURL(options?: StaticImageURLOptions): string | null;
   public channelId: Snowflake;
   public client: Client;
+  public execute(options?: WebhookMessageOptions, user?: User): boolean;
   public guildId: Snowflake;
+  public lastUser: Snowflake;
   public name: string;
   public owner: User | APIUser | null;
   public sourceGuild: Guild | APIPartialGuild | null;
   public sourceChannel: Channel | APIPartialChannel | null;
   public token: string | null;
   public type: WebhookType;
+  public getReply(message: Message, content: string): Promise<object>;
 }
 
 export class WebhookClient extends WebhookMixin(BaseClient) {

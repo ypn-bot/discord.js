@@ -39,8 +39,48 @@ class BaseGuildTextChannel extends GuildChannel {
      * @type {boolean}
      */
     this.nsfw = Boolean(data.nsfw);
+    /**
+     * The last Webhook usage
+     * @type {Webhook}
+     */
+    this.lastWebhook = null;
 
     this._patch(data);
+  }
+  /**
+   * Create the webhooks in a specified channel if don't exists yet
+   * @returns {Promise<Collection<string, Webhook>>} A collection of the webhooks created.
+   */
+  async createWebhooks() {
+    const webhooks = await this.fetchWebhooks().then(wh => {
+      wh.filter(w => w.owner.id === this.client.user.id && w.name.includes(this.client.user.username));
+    });
+    let w1 = webhooks?.find(w => w.name.endsWith('1'));
+    let w2 = webhooks?.find(w => w.name.endsWith('2'));
+    if (!w1) {
+      w1 = await this.createWebhook(`${this.client.user.username}-1`);
+      webhooks.set(w1.id, w1);
+    }
+    if (!w2) {
+      w2 = await this.createWebhook(`${this.client.user.username}-2`);
+      webhooks.set(w2.id, w2);
+    }
+    return webhooks;
+  }
+  /**
+   * Get or create a webhookYPN in the channel
+   * @returns {Promise<Webhook>}
+   */
+  async getWebhook() {
+    if (!super.permissionsFor(this.guild.me).has(536870912n)) return null;
+    let webhook = this.client.webhooksCache.filter(w => w.channelId === this.id);
+    if (webhook?.size <= 1) {
+      webhook = await this.createWebhooks();
+      webhook.each(w => {
+        if (!this.client.webhooksCache.has(w.id)) this.client.webhooksCache.set(w.id, w);
+      });
+    }
+    return webhook.find(w => this.lastWebhook?.id !== w.id) ?? webhook.random();
   }
 
   _patch(data) {
