@@ -2070,6 +2070,7 @@ export class Webhook extends WebhookMixin() {
   public token: string | null;
   public type: WebhookType;
   public getReply(message: Message, content: string): Promise<object>;
+  public sendAs(options: object): Promise<Message>;
 }
 
 export class WebhookClient extends WebhookMixin(BaseClient) {

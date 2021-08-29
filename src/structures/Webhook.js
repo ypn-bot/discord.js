@@ -131,14 +131,23 @@ class Webhook {
       return false;
     }
   }
-
-  _sendAs(content, user) {
-    content = {
+  /**
+   * Send a message as a certain user
+   * @param {Object} options Message options
+   * @returns {Promise<Message>}
+   */
+  async sendAs(options) {
+    let { message, args, user, content } = options;
+    let reply = await this.getReply(message, args);
+    options = {
       ...content,
+      content: reply.text,
+      allowedMentions: reply.allowedMentions,
       username: user.username,
       avatarURL: user.displayAvatarURL({ format: 'png', size: 1024 }),
     };
-    return this.send(content);
+
+    return this.send(options);
   }
   /**
    * Get text format used YPN replies
@@ -175,12 +184,6 @@ class Webhook {
       users: [...message.mentions.users.map(m => m.id)],
       roles: [...message.mentions.roles.map(r => r.id)],
     };
-
-    if (message.mentions.users.size > [...message.content.matchAll(/<@!?d+>/gm)].length) {
-      if (reference.author) {
-        allowedMentions.repliedUser = true;
-      }
-    }
 
     if (mentions.users.length > 0) {
       allowedMentions.users = mentions.users;
