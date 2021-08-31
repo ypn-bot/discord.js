@@ -741,6 +741,9 @@ class Message extends Base {
       data = options;
     } else {
       if (!options.ping) {
+        if (typeof options === 'string') {
+          options = { content: options };
+        }
         options = { ...options, allowedMentions: { parse: [] } };
       }
       data = MessagePayload.create(this, options, {
