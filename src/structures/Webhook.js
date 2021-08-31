@@ -110,28 +110,6 @@ class Webhook {
    */
 
   /**
-   * Send a message to the specified channel using a random webhook
-   * @param {WebhookMessageOptions} options The default options that will be passed to the webhook.
-   * @param {User} user The user that will be user as the webhook name. (Optional)
-   * @returns {Promise<boolean>}
-   */
-  async execute(options, user) {
-    if (user) {
-      options = {
-        ...options,
-        username: user.username,
-        avatarURL: user.displayAvatarURL({ format: 'png', size: 1024 }),
-      };
-    }
-    try {
-      await this.send(options);
-      return true;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-  }
-  /**
    * Send a message as a certain user
    * @param {Object} options Message options
    * @returns {Promise<Message>}
@@ -164,7 +142,7 @@ class Webhook {
     let msg = reference.content?.replace(/^┌.*\n/i, '') || 'Click to see message';
 
     if (msg.length > 50) {
-      msg = `${msg.split(0, 50)} ...`;
+      msg = `${msg.split(0, 50)}...`;
     }
 
     if ([...msg.matchAll(/\|\|/g)].length % 2 !== 0) {

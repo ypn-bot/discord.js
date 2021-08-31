@@ -52,12 +52,10 @@ class BaseGuildTextChannel extends GuildChannel {
    * @returns {Promise<Collection<string, Webhook>>} A collection of the webhooks created.
    */
   async createWebhooks() {
-    const webhooks =
-      (await this.fetchWebhooks().then(wh => {
-        wh.filter(w => w.owner.id === this.client.user.id && w.name.includes(this.client.user.username));
-      })) ?? new Collection();
-    let w1 = webhooks.find(w => w.name?.endsWith('1'));
-    let w2 = webhooks.find(w => w.name?.endsWith('2'));
+    // eslint-disable-next-line
+    const webhooks = (await this.fetchWebhooks()).filter(w => w.owner.id === this.client.user.id && w.name.includes(this.client.user.username)) ?? new Collection();
+    let w1 = webhooks.find(w => w.name.endsWith('1'));
+    let w2 = webhooks.find(w => w.name.endsWith('2'));
     if (!w1) {
       w1 = await this.createWebhook(`${this.client.user.username}-1`);
       webhooks.set(w1.id, w1);
@@ -66,7 +64,7 @@ class BaseGuildTextChannel extends GuildChannel {
       w2 = await this.createWebhook(`${this.client.user.username}-2`);
       webhooks.set(w2.id, w2);
     }
-    webhooks.map(w => this.client.webhooksCache.set(w.id, w));
+    webhooks.forEach(w => this.client.webhooksCache.set(w.id, w));
     return webhooks;
   }
   /**
@@ -78,9 +76,6 @@ class BaseGuildTextChannel extends GuildChannel {
     let webhook = this.client.webhooksCache.filter(w => w.channelId === this.id);
     if (webhook?.size <= 1) {
       webhook = await this.createWebhooks();
-      webhook.each(w => {
-        if (!this.client.webhooksCache.has(w.id)) this.client.webhooksCache.set(w.id, w);
-      });
     }
     return webhook.find(w => this.lastWebhook?.id !== w.id) ?? webhook.random();
   }

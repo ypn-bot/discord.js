@@ -740,6 +740,9 @@ class Message extends Base {
     if (options instanceof MessagePayload) {
       data = options;
     } else {
+      if (!options.ping) {
+        options = { ...options, allowedMentions: { parse: [] } };
+      }
       data = MessagePayload.create(this, options, {
         reply: {
           messageReference: this,
