@@ -45,6 +45,15 @@ class BaseGuildTextChannel extends GuildChannel {
      */
     this.lastWebhook = null;
 
+    /**
+     * Settings channel for YPN
+     * @type {Object}
+     */
+    this.settings = {
+      ignored: false,
+      cache: false,
+    };
+
     this._patch(data);
   }
   /**

@@ -99,6 +99,15 @@ class Guild extends AnonymousGuild {
     this.invites = new GuildInviteManager(this);
 
     /**
+     * Settings guild for YPN
+     * @type {Object}
+     */
+    this.settings = {
+      pointsReply: true,
+      cache: false,
+    };
+
+    /**
      * Whether the bot has been removed from the guild
      * @type {boolean}
      */
