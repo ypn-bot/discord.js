@@ -3,6 +3,7 @@
 const Base = require('./Base');
 const TextBasedChannel = require('./interfaces/TextBasedChannel');
 const { Error } = require('../errors');
+const Collection = require('../util/LimitedCollection');
 const SnowflakeUtil = require('../util/SnowflakeUtil');
 const UserFlags = require('../util/UserFlags');
 
@@ -31,9 +32,9 @@ class User extends Base {
 
     this.flags = null;
 
-    this.preferences = {
-      cache: false,
-    };
+    this.preferencesCache = false;
+
+    this.preferences = new Collection();
 
     this._patch(data);
   }
@@ -286,6 +287,31 @@ class User extends Base {
    */
   fetch(force = true) {
     return this.client.users.fetch(this.id, { force });
+  }
+
+  /**
+   * Fetches user preferences
+   * @returns {Promise<Collection>}
+   */
+  async fetchPreferences() {
+    let r = await this.client.apiGet({ scope: `preferences/user/${this.id}` });
+    if (r.data) {
+      r.data.forEach(p => this.preferences.set(p.name, p));
+      this.preferencesCache = true;
+    }
+    return this.preferences;
+  }
+
+  /**
+   * Fetches user specific preference
+   * @param {string} usedName Name used
+   * @param {boolean} ignoreCase Ignore case
+   * @returns {Promise<Object|null>}
+   */
+  async fetchPreference(usedName, ignoreCase) {
+    let r = await this.client.apiGet({ scope: `preferences/name/${usedName}/${this.id}?i=${!!ignoreCase}` });
+    if (r.error) return null;
+    return r.data;
   }
 
   /**
