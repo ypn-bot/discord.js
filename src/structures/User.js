@@ -312,7 +312,7 @@ class User extends Base {
     let r = this.preferences?.get(usedName);
     if (r) return r;
     r = await this.client.apiGet({ scope: `preferences/name/${usedName}/${this.id}?i=${!!ignoreCase}` });
-    if (r?.error || !r) return null;
+    if (r.error || !r.data) return null;
     this.preferencesCache = true;
     this.preferences?.set(r.data.name, r.data);
     return r.data;
