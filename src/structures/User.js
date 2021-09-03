@@ -31,6 +31,10 @@ class User extends Base {
 
     this.flags = null;
 
+    this.preferences = {
+      cache: false,
+    };
+
     this._patch(data);
   }
 

@@ -1927,6 +1927,7 @@ export class User extends PartialTextBasedChannel(Base) {
   public system: boolean;
   public readonly tag: string;
   public username: string;
+  public preferences: object;
   public avatarURL(options?: ImageURLOptions): string | null;
   public bannerURL(options?: ImageURLOptions): string | null;
   public createDM(): Promise<DMChannel>;
