@@ -311,6 +311,7 @@ class User extends Base {
   async fetchPreference(usedName, ignoreCase) {
     let r = await this.client.apiGet({ scope: `preferences/name/${usedName}/${this.id}?i=${!!ignoreCase}` });
     if (r.error) return null;
+    this.preferencesCache = true;
     return r.data;
   }
 
