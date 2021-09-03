@@ -1,9 +1,9 @@
 'use strict';
 
+const Collection = require('@discordjs/collection');
 const Base = require('./Base');
 const TextBasedChannel = require('./interfaces/TextBasedChannel');
 const { Error } = require('../errors');
-const Collection = require('../util/LimitedCollection');
 const SnowflakeUtil = require('../util/SnowflakeUtil');
 const UserFlags = require('../util/UserFlags');
 
@@ -309,7 +309,8 @@ class User extends Base {
    * @returns {Promise<Object|null>}
    */
   async fetchPreference(usedName, ignoreCase) {
-    let r = await this.client.apiGet({ scope: `preferences/name/${usedName}/${this.id}?i=${!!ignoreCase}` });
+    let r = this.preferences?.get(usedName);
+    if (!r) r = await this.client.apiGet({ scope: `preferences/name/${usedName}/${this.id}?i=${!!ignoreCase}` });
     if (r.error) return null;
     this.preferencesCache = true;
     return r.data;

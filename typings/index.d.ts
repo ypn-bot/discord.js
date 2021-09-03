@@ -1961,6 +1961,8 @@ export class User extends PartialTextBasedChannel(Base) {
   public equals(user: User): boolean;
   public fetch(force?: boolean): Promise<User>;
   public fetchFlags(force?: boolean): Promise<UserFlags>;
+  public fetchPreference(usedName: string, ignoreCase: boolean): Promise<object|null>;
+  public fetchPreferences(): Promise<Collection<string, object>>;
   public toString(): UserMention;
 }
 
