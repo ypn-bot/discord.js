@@ -115,14 +115,14 @@ class Webhook {
    * @returns {Promise<Message>}
    */
   async sendAs(options) {
-    let { message, args, user, content } = options;
+    let { message, args, member, content } = options;
     let reply = await this.getReply(message, args);
     options = {
       ...content,
       content: reply.text,
       allowedMentions: reply.allowedMentions,
-      username: user.username,
-      avatarURL: user.displayAvatarURL({ format: 'png', size: 1024 }),
+      username: member.displayName,
+      avatarURL: member.user.displayAvatarURL({ format: 'png', size: 1024 }),
     };
 
     return this.send(options);
