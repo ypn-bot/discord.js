@@ -1,6 +1,6 @@
 'use strict';
 
-const Collection = require('@discordjs/collection');
+const { Collection } = require('@discordjs/collection');
 const Base = require('./Base');
 const TextBasedChannel = require('./interfaces/TextBasedChannel');
 const { Error } = require('../errors');
