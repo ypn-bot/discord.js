@@ -56,6 +56,46 @@ class BaseGuildTextChannel extends GuildChannel {
 
     this._patch(data);
   }
+
+  /** @returns {Promise<boolean>} */
+  async fetchIgnored() {
+    let dt = await this.client.apiGet({ scope: `channels/${this.id}` });
+    this.settings = {
+      ignored: !!dt?.ignored,
+      cache: true,
+    };
+    return !!dt.ignored;
+  }
+
+  /**
+   * Set to ignore the channel
+   * @param {boolean} v
+   * @returns {Promise<Settings>}
+   */
+
+  async setIgnored(v) {
+    let dt = this.settings.ignored ?? (await this.fetchIgnored());
+    if (!dt && v) {
+      dt = await this.client.apiPut({
+        scope: 'channels/new',
+        data: {
+          channelId: this.id,
+          ignored: v,
+        },
+      });
+    }
+    if (dt && !v) {
+      await this.client.apiPut({
+        scope: `channels/${this.id}/delete`,
+      });
+    }
+    this.settings = {
+      ignored: v,
+      cache: true,
+    };
+    return this.settings;
+  }
+
   /**
    * Create the webhooks in a specified channel if don't exists yet
    * @returns {Promise<Collection<string, Webhook>>} A collection of the webhooks created.
