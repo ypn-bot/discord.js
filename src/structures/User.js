@@ -309,12 +309,10 @@ class User extends Base {
    * @returns {Promise<Object|null>}
    */
   async fetchPreference(usedName, ignoreCase) {
-    let r = this.preferences?.get(usedName);
-    if (r) return r;
-    r = await this.client.apiGet({ scope: `preferences/name/${usedName}/${this.id}?i=${!!ignoreCase}` });
-    if (r.error || !r.data) return null;
+    let r = await this.client.apiGet({ scope: `preferences/name/${usedName}/${this.id}?i=${!!ignoreCase}` });
+    if (r.error) return null;
     this.preferencesCache = true;
-    this.preferences?.set(r.data.name, r.data);
+    this.preferences.set(r.data.name, r.data);
     return r.data;
   }
 
