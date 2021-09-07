@@ -3308,7 +3308,7 @@ export interface ClientEvents {
   threadMemberUpdate: [oldMember: ThreadMember, newMember: ThreadMember];
   threadMembersUpdate: [
     oldMembers: Collection<Snowflake, ThreadMember>,
-    mewMembers: Collection<Snowflake, ThreadMember>,
+    newMembers: Collection<Snowflake, ThreadMember>,
   ];
   threadUpdate: [oldThread: ThreadChannel, newThread: ThreadChannel];
   typingStart: [typing: Typing];
@@ -4389,7 +4389,8 @@ export type MessageType =
   | 'REPLY'
   | 'APPLICATION_COMMAND'
   | 'THREAD_STARTER_MESSAGE'
-  | 'GUILD_INVITE_REMINDER';
+  | 'GUILD_INVITE_REMINDER'
+  | 'CONTEXT_MENU_COMMAND';
 
 export type MFALevel = keyof typeof MFALevels;
 
@@ -4656,7 +4657,10 @@ export type SystemChannelFlagsString =
 
 export type SystemChannelFlagsResolvable = BitFieldResolvable<SystemChannelFlagsString, number>;
 
-export type SystemMessageType = Exclude<MessageType, 'DEFAULT' | 'REPLY' | 'APPLICATION_COMMAND'>;
+export type SystemMessageType = Exclude<
+  MessageType,
+  'DEFAULT' | 'REPLY' | 'APPLICATION_COMMAND' | 'CONTEXT_MENU_COMMAND'
+>;
 
 export type StageChannelResolvable = StageChannel | Snowflake;
 
