@@ -123,7 +123,7 @@ class BaseGuildTextChannel extends GuildChannel {
   async getWebhook() {
     if (!super.permissionsFor(this.guild.me).has(536870912n)) return null;
     let webhook = this.client.webhooksCache.filter(w => w.channelId === this.id);
-    if (webhook?.size <= 1) {
+    if (webhook.size <= 1) {
       webhook = await this.createWebhooks();
     }
     return webhook.find(w => this.lastWebhook?.id !== w.id) ?? webhook.random();
