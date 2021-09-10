@@ -1953,6 +1953,7 @@ export class User extends PartialTextBasedChannel(Base) {
   public readonly tag: string;
   public username: string;
   public preferences: Collection<string, object>;
+  public preferencesCache: boolean;
   public avatarURL(options?: ImageURLOptions): string | null;
   public bannerURL(options?: ImageURLOptions): string | null;
   public createDM(): Promise<DMChannel>;
