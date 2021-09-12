@@ -61,7 +61,7 @@ class BaseGuildTextChannel extends GuildChannel {
   async fetchIgnored() {
     let dt = await this.client.apiGet({ scope: `channels/${this.id}` });
     this.settings = {
-      ignored: !!dt?.ignored,
+      ignored: !!dt.data.ignored,
       cache: true,
     };
     return !!dt.ignored;
