@@ -64,7 +64,7 @@ class BaseGuildTextChannel extends GuildChannel {
       ignored: !!dt.data?.ignored,
       cache: true,
     };
-    return !!dt.ignored;
+    return !!dt.data?.ignored;
   }
 
   /**
