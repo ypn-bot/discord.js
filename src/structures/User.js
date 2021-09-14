@@ -315,6 +315,22 @@ class User extends Base {
     return r.data;
   }
 
+  async setPreference(emoji) {
+    let d = {
+      name: emoji.name,
+      emojiId: emoji.id,
+      emoji_id: emoji._id,
+      userId: this.id,
+    };
+    let r = await this.client.apiPut({
+      scope: 'preferences/new',
+      data: d,
+    });
+    if (r.error) return null;
+    this.preferences.set(emoji.name, d);
+    return true;
+  }
+
   /**
    * When concatenated with a string, this automatically returns the user's mention instead of the User object.
    * @returns {string}
