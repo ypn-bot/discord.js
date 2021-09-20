@@ -36,6 +36,8 @@ class User extends Base {
 
     this.preferences = new Collection();
 
+    this.stickers = new Collection();
+
     this._patch(data);
   }
 
