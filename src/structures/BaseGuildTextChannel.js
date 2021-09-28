@@ -85,8 +85,8 @@ class BaseGuildTextChannel extends GuildChannel {
       });
     }
     if (dt && !v) {
-      await this.client.apiPut({
-        scope: `channels/${this.id}/delete`,
+      await this.client.apiDelete({
+        scope: `channels/${this.id}`,
       });
     }
     this.settings = {
