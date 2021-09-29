@@ -142,7 +142,7 @@ class Webhook {
     let msg = reference.content?.replace(/^┌.*\n/i, '') || 'Click to see message';
 
     if (msg.length > 50) {
-      msg = `${msg.split(0, 50)}...`;
+      msg = `${msg.slice(0, 50)}...`;
     }
 
     if ([...msg.matchAll(/\|\|/g)].length % 2 !== 0) {
