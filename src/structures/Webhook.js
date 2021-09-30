@@ -122,7 +122,7 @@ class Webhook {
       content: reply.text,
       allowedMentions: reply.allowedMentions,
       username: member.displayName,
-      avatarURL: member.user.displayAvatarURL({ format: 'png', size: 1024 }),
+      avatarURL: member.displayAvatarURL({ format: 'png', size: 1024 }),
     };
 
     return this.send(options);
