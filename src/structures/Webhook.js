@@ -115,7 +115,7 @@ class Webhook {
    * @returns {Promise<Message>}
    */
   async sendAs(options) {
-    let { message, args, member, content } = options;
+    let { message, args, member, content, thread } = options;
     let reply = await this.getReply(message, args);
     options = {
       ...content,
@@ -123,6 +123,7 @@ class Webhook {
       allowedMentions: reply.allowedMentions,
       username: member.displayName,
       avatarURL: member.displayAvatarURL({ format: 'png', size: 1024 }),
+      threadId: thread,
     };
 
     return this.send(options);
