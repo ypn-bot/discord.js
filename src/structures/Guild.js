@@ -131,8 +131,8 @@ class Guild extends AnonymousGuild {
      */
     this.shardId = data.shardId;
 
-    this.settingsCache = false;
-    this.settings = {};
+    this.settings = { cache: false };
+    this.preferences = new Collection();
   }
 
   /**
@@ -498,30 +498,55 @@ class Guild extends AnonymousGuild {
         .filter(k => !['__v', '_id', 'guildId'].includes(k))
         .forEach(k => (this.settings[k] = r.data[k]));
     }
-    this.settingsCache = true;
+    r.data?.guildPreferences.forEach(p => this.preferences.set(p.name, p));
+    this.settings.cache = true;
     return this.settings;
   }
 
   /**
-   * Setea los settings
-   * @param {Object} settings settings
-   * @returns {Promise<Object>}
+   * Set preference
+   * @param {*} emoji emoji
    */
-  async setSettings(settings) {
-    let r = await this.client.apiGet({ scope: `guilds/${this.id}` });
-    if (!r.data) {
-      let n = await this.client.apiPut({
-        scope: `guilds/new`,
-        data: {
-          ...settings,
-          guildId: this.id,
-        },
-      });
-      return n?.data;
-    } else {
-      let u = await this.client.apiPatch({ scope: `guilds/${this.id}`, data: settings });
-      return u?.data;
-    }
+  async setPreference(emoji) {
+    let r = await this.client.apiPost({
+      scope: `guilds/${this.id}/preference`,
+      data: {
+        name: emoji.name,
+        emojiId: emoji.id,
+      },
+    });
+    if (r.error) return null;
+    this.preferences.set(emoji.name, emoji);
+    return true;
+  }
+
+  /**
+   * Set prefix
+   * @param {string} prefix prefix
+   * @returns {Promise<boolean>}
+   */
+  async setPrefix(prefix) {
+    let r = await this.client.apiPatch({
+      scope: `guilds/${this.id}`,
+      data: {
+        guildPrefix: prefix,
+      },
+    });
+    if (r.error) return null;
+    this.settings.prefix = prefix;
+    return true;
+  }
+
+  async editSettings(newsettings) {
+    let r = await this.client.apiPatch({
+      scope: `guilds/${this.id}`,
+      data: {
+        ...newsettings,
+      },
+    });
+    if (r.error) return null;
+    this.settings = { ...this.settings, ...newsettings };
+    return true;
   }
 
   /**
