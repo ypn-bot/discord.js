@@ -45,6 +45,16 @@ class ThreadChannel extends Channel {
      * @type {ThreadMemberManager}
      */
     this.members = new ThreadMemberManager(this);
+
+    /**
+     * Settings channel for YPN
+     * @type {Object}
+     */
+    this.settings = {
+      ignored: false,
+      cache: true,
+    };
+
     if (data) this._patch(data, fromInteraction);
   }
 

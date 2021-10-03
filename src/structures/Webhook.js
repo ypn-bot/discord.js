@@ -115,14 +115,15 @@ class Webhook {
    * @returns {Promise<Message>}
    */
   async sendAs(options) {
-    let { message, args, member, content } = options;
+    let { message, args, member, content, thread } = options;
     let reply = await this.getReply(message, args);
     options = {
       ...content,
       content: reply.text,
       allowedMentions: reply.allowedMentions,
       username: member.displayName,
-      avatarURL: member.user.displayAvatarURL({ format: 'png', size: 1024 }),
+      avatarURL: member.displayAvatarURL({ format: 'png', size: 1024 }),
+      threadId: thread,
     };
 
     return this.send(options);
@@ -280,7 +281,7 @@ class Webhook {
    * Options used to edit a {@link Webhook}.
    * @typedef {Object} WebhookEditData
    * @property {string} [name=this.name] The new name for the webhook
-   * @property {BufferResolvable} [avatar] The new avatar for the webhook
+   * @property {?(BufferResolvable)} [avatar] The new avatar for the webhook
    * @property {GuildTextChannelResolvable} [channel] The new channel for the webhook
    */
 
