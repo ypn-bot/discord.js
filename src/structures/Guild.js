@@ -130,6 +130,9 @@ class Guild extends AnonymousGuild {
      * @type {number}
      */
     this.shardId = data.shardId;
+
+    this.settingsCache = false;
+    this.settings = {};
   }
 
   /**
@@ -482,6 +485,43 @@ class Guild extends AnonymousGuild {
    */
   fetchOwner(options) {
     return this.members.fetch({ ...options, user: this.ownerId });
+  }
+
+  /**
+   * Fetchea los settings
+   * @returns {Promise<Object>}
+   */
+  async fetchSettings() {
+    let r = await this.client.apiGet({ scope: `guilds/${this.id}` });
+    if (r.data) {
+      Object.keys(r.data)
+        .filter(k => !['__v', '_id', 'guildId'].includes(k))
+        .forEach(k => (this.settings[k] = r.data[k]));
+    }
+    this.settingsCache = true;
+    return this.settings;
+  }
+
+  /**
+   * Setea los settings
+   * @param {Object} settings settings
+   * @returns {Promise<Object>}
+   */
+  async setSettings(settings) {
+    let r = await this.client.apiGet({ scope: `guilds/${this.id}` });
+    if (!r.data) {
+      let n = await this.client.apiPut({
+        scope: `guilds/new`,
+        data: {
+          ...settings,
+          guildId: this.id,
+        },
+      });
+      return n?.data;
+    } else {
+      let u = await this.client.apiPatch({ scope: `guilds/${this.id}`, data: settings });
+      return u?.data;
+    }
   }
 
   /**
