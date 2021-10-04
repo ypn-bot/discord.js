@@ -508,11 +508,11 @@ class Guild extends AnonymousGuild {
    * @param {*} emoji emoji
    */
   async setPreference(emoji) {
-    let r = await this.client.apiPost({
-      scope: `guilds/${this.id}/preference`,
+    if (!this.settings.cache) await this.fetchSettings();
+    let r = await this.client.apiPatch({
+      scope: `guilds/${this.id}`,
       data: {
-        name: emoji.name,
-        emojiId: emoji.id,
+        $set: { guildPreferences: [...this.preferences.toJSON(), { name: emoji.name, emojiId: emoji.id }] },
       },
     });
     if (r.error) return null;
