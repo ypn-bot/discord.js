@@ -509,13 +509,14 @@ class Guild extends AnonymousGuild {
    */
   async setPreference(emoji) {
     if (!this.settings.cache) await this.fetchSettings();
+    let p = {
+      $set: { guildPreferences: [...this.preferences.toJSON(), { name: emoji.name, emojiId: emoji.id }] },
+    };
     let r = await this.client.apiPatch({
       scope: `guilds/${this.id}`,
-      data: {
-        $set: { guildPreferences: [...this.preferences.toJSON(), { name: emoji.name, emojiId: emoji.id }] },
-      },
+      data: p,
     });
-    if (r.error) return null;
+    if (r.error) return this.editSettings(p);
     this.preferences.set(emoji.name, emoji);
     return true;
   }
@@ -532,7 +533,7 @@ class Guild extends AnonymousGuild {
         guildPrefix: prefix,
       },
     });
-    if (r.error) return null;
+    if (r.error) return this.editSettings({ guildPrefix: prefix });
     this.settings.prefix = prefix;
     return true;
   }
