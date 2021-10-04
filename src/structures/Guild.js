@@ -516,8 +516,8 @@ class Guild extends AnonymousGuild {
       scope: `guilds/${this.id}`,
       data: p,
     });
-    if (r.error) return this.editSettings(p);
     this.preferences.set(emoji.name, emoji);
+    if (r.error) return this.editSettings(p);
     return true;
   }
 
@@ -533,8 +533,8 @@ class Guild extends AnonymousGuild {
         guildPrefix: prefix,
       },
     });
-    if (r.error) return this.editSettings({ guildPrefix: prefix });
     this.settings.prefix = prefix;
+    if (r.error) return this.editSettings({ guildPrefix: prefix });
     return true;
   }
 
@@ -555,6 +555,7 @@ class Guild extends AnonymousGuild {
       });
       if (r.error) return null;
     }
+    Object.keys(newsettings).forEach(k => (k.startsWith('$') ? delete newsettings[k] : null));
     this.settings = { ...this.settings, ...newsettings };
     return true;
   }
