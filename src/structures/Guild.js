@@ -544,7 +544,16 @@ class Guild extends AnonymousGuild {
         ...newsettings,
       },
     });
-    if (r.error) return null;
+    if (r.error) {
+      r = await this.client.apiPut({
+        scope: `guilds/new`,
+        data: {
+          guildId: this.id,
+          ...newsettings,
+        },
+      });
+      if (r.error) return null;
+    }
     this.settings = { ...this.settings, ...newsettings };
     return true;
   }
