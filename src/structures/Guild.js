@@ -550,6 +550,7 @@ class Guild extends AnonymousGuild {
         scope: `guilds/new`,
         data: {
           guildId: this.id,
+          pointsReply: !!this.settings?.pointsReply,
           ...newsettings,
         },
       });
