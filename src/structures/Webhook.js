@@ -124,6 +124,7 @@ class Webhook {
       username: member.displayName,
       avatarURL: member.displayAvatarURL({ format: 'png', size: 1024 }),
       threadId: thread,
+      files: message.attachments?.toJSON(),
     };
 
     return this.send(options);

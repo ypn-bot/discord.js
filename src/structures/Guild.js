@@ -130,6 +130,9 @@ class Guild extends AnonymousGuild {
      * @type {number}
      */
     this.shardId = data.shardId;
+
+    this.settings = { cache: false };
+    this.preferences = new Collection();
   }
 
   /**
@@ -482,6 +485,80 @@ class Guild extends AnonymousGuild {
    */
   fetchOwner(options) {
     return this.members.fetch({ ...options, user: this.ownerId });
+  }
+
+  /**
+   * Fetchea los settings
+   * @returns {Promise<Object>}
+   */
+  async fetchSettings() {
+    let r = await this.client.apiGet({ scope: `guilds/${this.id}` });
+    if (r.data) {
+      Object.keys(r.data)
+        .filter(k => !['__v', '_id', 'guildId'].includes(k))
+        .forEach(k => (this.settings[k] = r.data[k]));
+    }
+    r.data?.guildPreferences.forEach(p => this.preferences.set(p.name, p));
+    this.settings.cache = true;
+    return this.settings;
+  }
+
+  /**
+   * Set preference
+   * @param {*} emoji emoji
+   */
+  async setPreference(emoji) {
+    if (!this.settings.cache) await this.fetchSettings();
+    let p = {
+      $set: { guildPreferences: [...this.preferences.toJSON(), { name: emoji.name, emojiId: emoji.id }] },
+    };
+    let r = await this.client.apiPatch({
+      scope: `guilds/${this.id}`,
+      data: p,
+    });
+    this.preferences.set(emoji.name, emoji);
+    if (r.error) return this.editSettings(p);
+    return true;
+  }
+
+  /**
+   * Set prefix
+   * @param {string} prefix prefix
+   * @returns {Promise<boolean>}
+   */
+  async setPrefix(prefix) {
+    let r = await this.client.apiPatch({
+      scope: `guilds/${this.id}`,
+      data: {
+        guildPrefix: prefix,
+      },
+    });
+    this.settings.prefix = prefix;
+    if (r.error) return this.editSettings({ guildPrefix: prefix });
+    return true;
+  }
+
+  async editSettings(newsettings) {
+    let r = await this.client.apiPatch({
+      scope: `guilds/${this.id}`,
+      data: {
+        ...newsettings,
+      },
+    });
+    if (r.error) {
+      r = await this.client.apiPut({
+        scope: `guilds/new`,
+        data: {
+          guildId: this.id,
+          pointsReply: !!this.settings?.pointsReply,
+          ...newsettings,
+        },
+      });
+      if (r.error) return null;
+    }
+    Object.keys(newsettings).forEach(k => (k.startsWith('$') ? delete newsettings[k] : null));
+    this.settings = { ...this.settings, ...newsettings };
+    return true;
   }
 
   /**
