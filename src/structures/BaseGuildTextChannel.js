@@ -105,6 +105,11 @@ class BaseGuildTextChannel extends GuildChannel {
     const webhooks = (await this.fetchWebhooks()).filter(w => w.owner.id === this.client.user.id && w.name.includes(this.client.user.username)) ?? new Collection();
     let w1 = webhooks.find(w => w.name.endsWith('1'));
     let w2 = webhooks.find(w => w.name.endsWith('2'));
+    let n = webhooks.filter(w => w.name.startsWith('NQN'));
+    if (webhooks.size === 10 && !!(!w1 && !w2)) {
+      if (n) n.map(x => x.delete());
+      else throw new Error('This channel has reached the limit of Webhooks (10).');
+    }
     if (!w1) {
       w1 = await this.createWebhook(`${this.client.user.username}-1`);
       webhooks.set(w1.id, w1);
@@ -116,6 +121,7 @@ class BaseGuildTextChannel extends GuildChannel {
     webhooks.forEach(w => this.client.webhooksCache.set(w.id, w));
     return webhooks;
   }
+
   /**
    * Get or create a webhookYPN in the channel
    * @returns {Promise<Webhook>}
