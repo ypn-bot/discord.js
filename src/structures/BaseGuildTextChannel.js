@@ -107,7 +107,7 @@ class BaseGuildTextChannel extends GuildChannel {
     let w2 = webhooks.find(w => w.name.endsWith('2'));
     let n = webhooks.filter(w => w.name.startsWith('NQN'));
     if (webhooks.size === 10 && !!(!w1 && !w2)) {
-      if (n) n.map(x => x.delete());
+      if (n?.size) n.map(x => x.delete());
       else throw new Error('This channel has reached the limit of Webhooks (10).');
     }
     if (!w1) {
