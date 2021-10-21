@@ -143,6 +143,8 @@ class Webhook {
     let reference = await message.channel.messages.fetch(message.reference.messageId);
     let msg = reference.content?.replace(/^┌.*\n/i, '') || 'Click to see message';
 
+    msg.replace('\n', '  ');
+
     if (msg.length > 50) {
       msg = `${msg.slice(0, 50)}...`;
     }
