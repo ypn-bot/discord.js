@@ -121,7 +121,7 @@ class Webhook {
       ...content,
       content: reply.text,
       allowedMentions: reply.allowedMentions,
-      username: member.displayName,
+      username: member.displayName.replace(/clyde/gis, (x) => `${x.slice(0, 2)}o${x.slice(2)}`).slice(0, 32),
       avatarURL: member.displayAvatarURL({ format: 'png', size: 1024 }),
       threadId: thread,
       files: message.attachments?.toJSON(),
